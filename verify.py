@@ -89,7 +89,8 @@ def extract_diff(scene_text: str, character_names: list[str]) -> dict:
     ]
 
     for attempt in range(1, MAX_RETRIES + 1):
-        raw = chat_json(messages, max_tokens=1024)
+        label = "diff抽出中" if attempt == 1 else f"diff再抽出 ({attempt}/{MAX_RETRIES})"
+        raw = chat_json(messages, max_tokens=1024, spinner_label=label)
         diff = _parse_diff(raw)
         if diff is not None:
             if config.DEBUG_MODE:

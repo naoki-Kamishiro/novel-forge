@@ -55,14 +55,14 @@ def generate(genre: str, title: str, length: str) -> dict:
         required += list(_REQUIRED_ACTS)
 
     for attempt in range(1, MAX_RETRIES + 1):
-        raw    = chat_json(messages, max_tokens=2048)
+        label = "プロット生成中" if attempt == 1 else f"プロット再生成 ({attempt}/{MAX_RETRIES})"
+        raw    = chat_json(messages, max_tokens=2048, spinner_label=label)
         result = _parse(raw)
         if result and all(result.get(k) for k in required):
-            system_print("プロット生成完了")
             return _finalize(result, length)
         if attempt < MAX_RETRIES:
             missing = [k for k in required if not (result or {}).get(k)]
-            system_print(f"再試行 ({attempt}/{MAX_RETRIES}) 不足: {', '.join(missing)}")
+            system_print(f"不足フィールド: {', '.join(missing)}")
 
     system_print("プロット生成に失敗しました。最低限の構造で続行します。")
     return _fallback(genre, title)

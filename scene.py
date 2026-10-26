@@ -126,10 +126,13 @@ def generate_scene(scene_id: str | None = None) -> str:
     max_tokens = config.LENGTH_SETTINGS.get(length_key, {}).get("max_tokens", 2048)
     use_verify = config.LENGTH_SETTINGS.get(length_key, {}).get("use_verify", False)
 
+    total_scenes = st.get("total_scenes_written", 0) + remaining  # 概算
     # 生成ループ（矛盾があればリトライ）
     for attempt in range(1, MAX_RETRIES + 1):
-        system_print(f"シーン{scene_no} 生成中..." + (f" (試行{attempt})" if attempt > 1 else ""))
-        scene_text = api.chat(messages, max_tokens=max_tokens)
+        label = f"シーン{scene_no} 執筆中"
+        if attempt > 1:
+            label = f"シーン{scene_no} 再生成 (試行{attempt}/{MAX_RETRIES})"
+        scene_text = api.chat(messages, max_tokens=max_tokens, spinner_label=label)
 
         if scene_text.startswith("[ERROR"):
             system_print(f"生成エラー: {scene_text}")
