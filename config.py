@@ -1,6 +1,11 @@
-LM_STUDIO_URL = "http://localhost:1234/v1"  # LM StudioのローカルサーバーURL
+BASE_URL      = "http://localhost:1234/v1"  # LM StudioのローカルサーバーURL
+LM_STUDIO_URL = BASE_URL                   # 後方互換
 API_KEY       = "lm-studio"               # LM Studioは認証不要なので任意の文字列でOK
-TEMPERATURE   = 0.85                      # 本文生成のランダム性
+MODEL         = "local"                    # LM Studioは常に "local" を指定
+TEMPERATURE       = 0.85                  # 本文生成のランダム性
+JSON_TEMPERATURE  = 0.5                   # JSON生成のランダム性（低めに固定）
+MAX_TOKENS        = 2048                  # 本文生成の最大トークン数
+JSON_MAX_TOKENS   = 2048                  # JSON生成の最大トークン数
 SAVE_DIR      = "saves"                   # セーブデータの保存ディレクトリ
 
 # 長さ別の目標文字数とシーンあたり出力トークン
