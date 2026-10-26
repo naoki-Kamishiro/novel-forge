@@ -20,7 +20,7 @@ LENGTH_SETTINGS = {
     "短編": {
         "label":          "短編",
         "target_chars":   30_000,
-        "max_tokens":     2048,
+        "max_tokens":     4096,
         "use_ledger":     True,
         "use_verify":     True,
     },
