@@ -39,10 +39,25 @@ def _pop_next_beat(beat_queue: list, beat_ptr: int) -> tuple[str, int]:
     cost = beat.get("cost", "")
 
     templates = {
-        "misconception": f"このシーンで「{content}」という出来事を起こすこと。内面の変化ではなく、外から観察できる出来事として描写すること。事実はNPCが台詞で言ってよいが、その意味を地の文やNPCが説明しないこと。",
-        "failure":       f"このシーンで「{content}」という状況を発生させること。主人公の行動とは別に、世界の側から引き起こすこと。",
-        "twist":         f"このシーンで「{content}」という展開を世界の側から発生させること。事実はNPCが台詞で言ってよいが、その意味を地の文やNPCが説明しないこと。",
-        "choice":        f"このシーンで「{content}」という局面を描くこと。代償は「{cost}」。選択肢を箇条書きで列挙しないこと。",
+        "misconception": (
+            f"このシーンで「{content}」という出来事を起こすこと。"
+            "具体的な行動・台詞・物体の変化として描写すること（内面描写・説明文で代替しないこと）。"
+            "その意味や教訓を地の文やNPCが言葉にしないこと。"
+        ),
+        "failure": (
+            f"このシーンで「{content}」という失敗を発生させること。"
+            "主人公が何かを試み、具体的な行動の結果として失敗が起きること（説明で済まさないこと）。"
+            "失敗の原因や意味を地の文で解説しないこと。"
+        ),
+        "twist": (
+            f"このシーンで「{content}」という展開を世界の側から起こすこと。"
+            "人物・物・状況のいずれかが具体的に動くことで読者に伝わるようにすること。"
+            "その意味を地の文やNPCが言葉にしないこと。"
+        ),
+        "choice": (
+            f"このシーンで「{content}」という選択の局面を描くこと。代償は「{cost}」。"
+            "主人公が実際に何かをしようとする場面として描くこと。選択肢を箇条書きで列挙しないこと。"
+        ),
     }
 
     injection = templates.get(b_type, f"このシーンで「{content}」を描くこと。")
@@ -141,6 +156,7 @@ def generate_scene(scene_id: str | None = None) -> str:
         if not use_verify:
             # 検証不要（ショートショート）はそのまま返す
             state.update({"beat_ptr": new_beat_ptr})
+            check_repetition(scene_text, scene_no)
             return scene_text
 
         # 矛盾チェック
@@ -149,6 +165,7 @@ def generate_scene(scene_id: str | None = None) -> str:
         if not errors:
             # OK: beat_ptrを進める
             state.update({"beat_ptr": new_beat_ptr})
+            check_repetition(scene_text, scene_no)
             if config.DEBUG_MODE:
                 print(f"[scene] scene_id={scene_id} OK diff_chars={len(diff.get('characters', []))}", file=sys.stderr)
             return scene_text
@@ -181,6 +198,26 @@ def _get_scene_beat(plot: dict, chapter_no: int | None, scene_no: int) -> str:
 # ──────────────────────────────────────────────
 # 本文の保存・末尾取得
 # ──────────────────────────────────────────────
+
+def check_repetition(scene_text: str, scene_no: int) -> None:
+    """
+    同じ文頭（10字）が近傍（前後5段落）に複数出現したら警告を出す。
+    修正はしない。気づきのための簡易チェック。
+    """
+    paragraphs = [p.strip() for p in scene_text.split("\n") if p.strip() and not p.strip().startswith("「")]
+    warnings = []
+    seen: dict[str, int] = {}
+    for i, para in enumerate(paragraphs):
+        key = para[:10]
+        if key in seen and i - seen[key] <= 5:
+            warnings.append(f"  段落{seen[key]+1}と段落{i+1}で類似した書き出し: 「{key}…」")
+        seen[key] = i
+    if warnings:
+        from display import warn_print
+        warn_print(f"シーン{scene_no} 繰り返し疑い:")
+        for w in warnings:
+            warn_print(w)
+
 
 def append_to_output(title: str, scene_text: str) -> None:
     """生成した本文をoutput/に追記保存する。"""

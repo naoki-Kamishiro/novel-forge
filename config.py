@@ -13,7 +13,7 @@ LENGTH_SETTINGS = {
     "ショートショート": {
         "label":          "ショートショート",
         "target_chars":   4_000,
-        "max_tokens":     2048,   # 一発〜3シーンで完結
+        "max_tokens":     4096,   # 1シーン完結のため余裕を持たせる（問題C対処）
         "use_ledger":     False,
         "use_verify":     False,
     },

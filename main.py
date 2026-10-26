@@ -56,7 +56,8 @@ def _choose_length() -> str:
 
 
 def _estimate_scenes(length: str) -> int:
-    return {"flash": 3, "short": 12, "medium": 30, "long": 60}.get(length, 12)
+    # flash=1: ショートショートは1シーン完結（max_tokens 4096で全文を出し切る）
+    return {"flash": 1, "short": 12, "medium": 30, "long": 60}.get(length, 12)
 
 
 # ──────────────────────────────────────────────
