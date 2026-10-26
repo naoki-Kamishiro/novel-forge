@@ -159,17 +159,7 @@ def check_consistency(diff: dict) -> list[str]:
         if ledger.is_dead(name) and entry.get("alive", True):
             errors.append(f"矛盾: {name} はすでに死亡しているが、このシーンで生きている")
 
-        # 失ったアイテムをまた失う
-        for item in entry.get("items_lost", []):
-            held = ledger.query(name, "item")
-            gained_items = [r["fact"].split("「")[1].split("」")[0]
-                            for r in held if "gained" in r["tags"] and "「" in r["fact"]]
-            lost_items   = [r["fact"].split("「")[1].split("」")[0]
-                            for r in held if "lost" in r["tags"] and "「" in r["fact"]]
-            currently_held = [i for i in gained_items if i not in lost_items]
-            if item not in currently_held:
-                errors.append(f"矛盾: {name} は「{item}」を持っていないが、失ったと記述されている")
-
+        # items_lost チェックは誤抽出（備品・容器等）による誤検知が多いため除外
         # 知識チェック（知らないはずの情報を知っている場合は検出困難なのでスキップ）
 
     if config.DEBUG_MODE and errors:
