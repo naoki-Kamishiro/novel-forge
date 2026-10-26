@@ -119,7 +119,7 @@ def build_scene_prompt(
     # 文字数目標
     # config から引くのを避けるため、remaining_scenes で簡易推定
     if remaining_scenes <= 1:
-        char_target = "1,500〜2,000字（このシーンで完結させること）"
+        char_target = "800〜1,200字（短く締めること。引き延ばさないこと）"
     elif remaining_scenes <= 3:
         char_target = "1,500〜2,000字"
     else:
