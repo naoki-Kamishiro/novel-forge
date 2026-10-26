@@ -142,7 +142,10 @@ def update_from_diff(sheets: dict, diff: dict) -> dict:
             if fact not in state["knowledge"]:
                 state["knowledge"].append(fact)
 
-        for target, rel in entry.get("relations", {}).items():
+        relations = entry.get("relations", {})
+        if not isinstance(relations, dict):
+            relations = {}
+        for target, rel in relations.items():
             state["relations"][target] = rel
 
         if "alive" in entry:
