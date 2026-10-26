@@ -43,10 +43,9 @@ from display import (
 # ──────────────────────────────────────────────
 
 LENGTH_OPTIONS = [
-    ("1", "ショートショート", "flash",  "〜4,000字"),
-    ("2", "短編",            "short",  "〜3万字"),
-    ("3", "中編",            "medium", "〜8万字"),
-    ("4", "長編",            "long",   "10万字〜"),
+    ("1", "ショートショート", "flash",  "〜6,000字"),
+    ("2", "短編",            "short",  "〜1.5万字"),
+    ("3", "中編",            "medium", "〜3万字"),
 ]
 
 
@@ -55,16 +54,15 @@ def _choose_length() -> str:
     for num, label, _, chars in LENGTH_OPTIONS:
         print(f"  {num}. {label}（{chars}）")
     while True:
-        choice = input("番号を入力 [1-4]: ").strip()
+        choice = input("番号を入力 [1-3]: ").strip()
         for num, _, key, _ in LENGTH_OPTIONS:
             if choice == num:
                 return key
-        print("1〜4で入力してください。")
+        print("1〜3で入力してください。")
 
 
 def _estimate_scenes(length: str) -> int:
-    # flash=3: ショートショートは3シーン章立て（1シーン≒2,000字 × 3 = 〜6,000字）
-    return {"flash": 3, "short": 12, "medium": 30, "long": 60}.get(length, 12)
+    return {"flash": 3, "short": 12, "medium": 25}.get(length, 12)
 
 
 # ──────────────────────────────────────────────
@@ -145,7 +143,7 @@ def writing_loop() -> None:
     total_scenes = _estimate_scenes(length)
     sheets = state.get_sheets()
     length_key = {"flash": "ショートショート", "short": "短編",
-                  "medium": "中編", "long": "長編"}.get(length, "短編")
+                  "medium": "中編"}.get(length, "短編")
     use_ledger = config.LENGTH_SETTINGS.get(length_key, {}).get("use_ledger", False)
 
     header_print(f"執筆開始：『{title}』")
@@ -197,7 +195,7 @@ def writing_loop() -> None:
         save_mod.autosave()
 
         # 章末の再計画（中編・長編のみ）
-        if length in ("medium", "long"):
+        if length == "medium":
             _maybe_replan(scene_no, total_scenes)
 
         # 終了判定（ショートショート・短編は残りシーン数で終了）

@@ -12,29 +12,22 @@ SAVE_DIR      = "saves"                   # セーブデータの保存ディレ
 LENGTH_SETTINGS = {
     "ショートショート": {
         "label":          "ショートショート",
-        "target_chars":   4_000,
-        "max_tokens":     4096,   # 1シーン完結のため余裕を持たせる（問題C対処）
+        "target_chars":   6_000,
+        "max_tokens":     4096,
         "use_ledger":     False,
         "use_verify":     False,
     },
     "短編": {
         "label":          "短編",
-        "target_chars":   30_000,
+        "target_chars":   15_000,
         "max_tokens":     4096,
         "use_ledger":     True,
         "use_verify":     True,
     },
     "中編": {
         "label":          "中編",
-        "target_chars":   80_000,
-        "max_tokens":     2048,
-        "use_ledger":     True,
-        "use_verify":     True,
-    },
-    "長編": {
-        "label":          "長編",
-        "target_chars":   150_000,
-        "max_tokens":     2048,
+        "target_chars":   30_000,
+        "max_tokens":     4096,
         "use_ledger":     True,
         "use_verify":     True,
     },
