@@ -141,7 +141,10 @@ def ingest_diff(scene_id: str, diff: dict) -> None:
             add_record(scene_id, "knowledge", name,
                        f"{name}は知っている：{fact}")
 
-        for target, rel in entry.get("relations", {}).items():
+        relations = entry.get("relations", {})
+        if not isinstance(relations, dict):
+            relations = {}
+        for target, rel in relations.items():
             add_record(scene_id, "relation", name,
                        f"{name}→{target}：{rel}")
 
