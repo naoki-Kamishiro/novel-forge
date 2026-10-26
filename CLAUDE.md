@@ -144,3 +144,11 @@ narrative-interactの「NPCテーマ代弁」と同じ問題。
 **実装済み**
 - items_lost誤認の抑制：_EXTRACT_SYSTEMに「直接所持・管理アイテムのみ対象」の制約を追記（verify.py）
 - 長編削除・長さ定義を12Bモデル実績値に修正（ショートショート〜6,000字・短編〜1.5万字・中編〜3万字）
+
+### 2026-10-26 品質改善セッション（セッション5）
+**Gemini評価（ギャグ_メントスコーラ・最新コミット）の結果**
+- items_lost矛盾が3件（プロンプト強化後も誤検知が継続）→ check_consistencyからitems_lostチェックを完全除外
+- foreshadow_resolved（A案）は機能確認済み：fs_001が正しく返ってきた
+
+**実装済み**
+- items_lostの矛盾チェックをcheck_consistencyから除外（verify.py）
