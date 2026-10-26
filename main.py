@@ -18,6 +18,12 @@ novel-forge エントリポイント。
 import argparse
 import sys
 
+# stdout/stderr を UTF-8 に固定（Windowsや環境依存のエンコーディング化けを防ぐ）
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8")
+
 import config
 import character
 import ledger
