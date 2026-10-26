@@ -106,7 +106,7 @@ def build_scene_prompt(
 
     # 直前シーンの末尾
     if prev_tail:
-        parts.append(f"【直前シーンの末尾】\n{prev_tail}")
+        parts.append(f"【直前シーンの末尾】\n{prev_tail}\n（↑ 上記は前シーンの末尾。このシーンは続きから書くこと。上記の台詞・描写を繰り返さないこと。）")
 
     # 台帳から引いた関連事実
     if ledger_facts:

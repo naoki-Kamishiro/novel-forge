@@ -276,12 +276,13 @@ def _sanitize_text(text: str) -> str:
     return "".join(result)
 
 
-def append_to_output(title: str, scene_text: str) -> None:
+def append_to_output(title: str, scene_text: str, scene_no: int = 0) -> None:
     """生成した本文をoutput/に追記保存する。"""
     OUTPUT_DIR.mkdir(exist_ok=True)
     safe_title = "".join(c for c in title if c not in r'\/:*?"<>|')[:40]
     out_path = OUTPUT_DIR / f"{safe_title}.txt"
     with open(out_path, "a", encoding="utf-8") as f:
+        f.write(f"── シーン{scene_no} ──\n")
         f.write(_sanitize_text(scene_text))
         f.write("\n\n")
 

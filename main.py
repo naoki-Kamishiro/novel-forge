@@ -174,7 +174,7 @@ def writing_loop() -> None:
         scene_print(scene_text)
 
         # ファイル保存
-        scene_mod.append_to_output(title, scene_text)
+        scene_mod.append_to_output(title, scene_text, scene_no)
 
         # 台帳・キャラシート更新
         if use_ledger:
