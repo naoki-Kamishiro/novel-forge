@@ -246,13 +246,43 @@ def check_repetition(scene_text: str, scene_no: int) -> None:
             warn_print(w)
 
 
+def _sanitize_text(text: str) -> str:
+    """LLMレスポンスに混入した異常文字を除去する。
+    - 制御文字（改行・タブ以外）
+    - CJK互換・特殊用途ブロックの記号（〠 U+3020 など）
+    """
+    import unicodedata
+    result = []
+    for ch in text:
+        cp = ord(ch)
+        # 改行・タブは保持
+        if ch in ("\n", "\t"):
+            result.append(ch)
+            continue
+        # ASCII制御文字（U+0000〜U+001F, U+007F）を除去
+        if cp < 0x20 or cp == 0x7F:
+            continue
+        # U+3020（POSTAL MARK FACE 〠）など CJK記号・句読点ブロックの特殊記号を除去
+        # 通常の句読点（U+3001〜U+301F）は保持し、U+3020以上の特殊記号のみ除去
+        if 0x3020 <= cp <= 0x302F:
+            continue
+        # CJK互換漢字・特殊用途ブロック（U+3800〜U+38FF）を除去
+        if 0x3800 <= cp <= 0x38FF:
+            continue
+        # Unicodeカテゴリが Cc（制御）の文字を除去
+        if unicodedata.category(ch) == "Cc":
+            continue
+        result.append(ch)
+    return "".join(result)
+
+
 def append_to_output(title: str, scene_text: str) -> None:
     """生成した本文をoutput/に追記保存する。"""
     OUTPUT_DIR.mkdir(exist_ok=True)
     safe_title = "".join(c for c in title if c not in r'\/:*?"<>|')[:40]
     out_path = OUTPUT_DIR / f"{safe_title}.txt"
     with open(out_path, "a", encoding="utf-8") as f:
-        f.write(scene_text)
+        f.write(_sanitize_text(scene_text))
         f.write("\n\n")
 
 
