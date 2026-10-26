@@ -115,6 +115,12 @@ def generate_scene(scene_id: str | None = None) -> str:
         if unresolved:
             open_threads = "\n".join(f"- {fs['content']}" for fs in unresolved)
 
+    # 結末・クライマックス（ショートショートは常に渡す、他は残り3シーン以下で渡す）
+    ending     = plot.get("ending", "")
+    climax     = plot.get("climax", {})
+    climax_peak = climax.get("peak", "") if isinstance(climax, dict) else ""
+    pass_goal  = (length == "flash") or (remaining <= 3)
+
     # プロンプト組み立て
     full_prompt = build_scene_prompt(
         genre=genre,
@@ -130,6 +136,8 @@ def generate_scene(scene_id: str | None = None) -> str:
         scene_no=scene_no,
         remaining_scenes=remaining,
         beat_injection=beat_injection,
+        ending=ending if pass_goal else "",
+        climax_peak=climax_peak if pass_goal else "",
     )
 
     messages = [

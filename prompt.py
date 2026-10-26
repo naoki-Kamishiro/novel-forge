@@ -54,6 +54,8 @@ def build_scene_prompt(
     scene_no: int,
     remaining_scenes: int,
     beat_injection: str = "",
+    ending: str = "",
+    climax_peak: str = "",
 ) -> str:
     """
     シーン生成用の完全なプロンプトを組み立てる。
@@ -74,6 +76,15 @@ def build_scene_prompt(
     loc_parts.append(f"シーン{scene_no}")
     loc_parts.append(f"（残り約{remaining_scenes}シーン）")
     parts.append(f"【現在位置】{'　'.join(loc_parts)}")
+
+    # 結末・クライマックス（残りシーンが少ない場合は常に表示、ショートショートは必ず）
+    if ending or climax_peak:
+        goal_parts = []
+        if climax_peak:
+            goal_parts.append(f"クライマックス: {climax_peak}")
+        if ending:
+            goal_parts.append(f"結末: {ending}")
+        parts.append("【この物語の到達点（管理用・テーマを直接言わないこと）】\n" + "\n".join(goal_parts))
 
     # ビート（今回起こすべき出来事）
     if scene_beat:
