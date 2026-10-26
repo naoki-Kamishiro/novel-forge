@@ -110,7 +110,20 @@ def build_scene_prompt(
     if open_threads:
         parts.append(f"【未回収の伏線】\n{open_threads}")
 
-    parts.append("\n以上を踏まえて、このシーンの本文を書いてください。地の文と台詞で構成し、JSON等は含めないこと。")
+    # 文字数目標
+    # config から引くのを避けるため、remaining_scenes で簡易推定
+    if remaining_scenes <= 1:
+        char_target = "3,000〜4,000字"
+    elif remaining_scenes <= 3:
+        char_target = "1,500〜2,500字"
+    else:
+        char_target = "1,000〜2,000字"
+
+    parts.append(
+        f"\n以上を踏まえて、このシーンの本文を書いてください。"
+        f"地の文と台詞で構成し、JSON等は含めないこと。"
+        f"目標文字数：{char_target}（短すぎず、途中で終わらないこと）。"
+    )
 
     return "\n\n".join(parts)
 
