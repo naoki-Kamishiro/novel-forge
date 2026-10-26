@@ -74,7 +74,7 @@ def generate(genre: str, title: str, length: str) -> dict:
 
 def _build_system(length: str) -> str:
     depth_note = {
-        "flash": "ショートショート（〜4,000字）向けプロット。protagonist・characters・ending・climax・beats（1〜2件）を生成してください。1シーンで完結する短い物語です。",
+        "flash": "ショートショート（〜6,000字）向けプロット。protagonist・characters・ending・climax・beats（2〜3件）を生成してください。3シーン章立て構成です。",
         "short": "短編（〜3万字）向けプロット。protagonist・characters・ending・climax・beatsを生成してください。",
         "medium": "中編（〜8万字）向けプロット。全フィールドを生成してください。",
         "long":  "長編（10万字〜）向けプロット。全フィールドに加えてsubplotsも生成してください。",
