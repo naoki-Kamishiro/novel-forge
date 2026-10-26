@@ -173,7 +173,7 @@ def build_context(sheets: dict, names: list[str] | None = None) -> str:
         f = sheet["fixed"]
         s = sheet["state"]
 
-        parts = [f"【{name}】"]
+        parts = [f"【{name}】（呼称は必ず「{name}」で統一すること）"]
         if f.get("appearance"):
             parts.append(f"外見: {f['appearance']}")
         if f.get("speech_style"):
