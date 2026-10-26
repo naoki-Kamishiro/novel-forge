@@ -66,20 +66,34 @@ _EXTRACT_SYSTEM = """\
   "foreshadow_planted": [
     { "content": "張られた伏線（一文）", "planned_resolution": "想定される回収方法" }
   ],
-  "foreshadow_resolved": []
+  "foreshadow_resolved": ["fs_001"]
 }
 
 注意:
 - 変化がないフィールドは空（[] or ""）にすること
 - 死亡したキャラは alive: false にすること
-- 登場しないキャラは含めないこと"""
+- 登場しないキャラは含めないこと
+- foreshadow_planted は「明確に後で回収される予定の伏線」のみ。汎用的な背景描写・キャラクター説明・世界設定は含めないこと
+- foreshadow_resolved は、ユーザーから提示された未回収伏線リストのIDを参照し、このシーンで回収されたものだけIDを列挙すること（回収がなければ []）"""
 
 
 def extract_diff(scene_text: str, character_names: list[str]) -> dict:
     """本文からdiffを抽出する。失敗時は空dict。"""
     names_str = "、".join(character_names) if character_names else "（なし）"
+
+    # 未回収の伏線リストをプロンプトに含める
+    unresolved = ledger.unresolved_foreshadow()
+    if unresolved:
+        fs_lines = "\n".join(
+            f"  - {fs['id']}: {fs['content']}" for fs in unresolved
+        )
+        fs_section = f"\n【未回収の伏線リスト（このシーンで回収されたものがあればIDを返すこと）】\n{fs_lines}\n"
+    else:
+        fs_section = ""
+
     user_msg = (
-        f"登場人物: {names_str}\n\n"
+        f"登場人物: {names_str}\n"
+        f"{fs_section}\n"
         f"【本文】\n{scene_text}\n\n"
         "上記の本文を読み、登場人物の状態変化をJSONで抽出してください。"
     )
