@@ -25,6 +25,7 @@ if hasattr(sys.stderr, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8")
 
 import config
+import api
 import character
 import ledger
 import plot as plot_mod
@@ -242,6 +243,7 @@ def load_and_resume(path: str) -> None:
         error_print(f"ロードに失敗しました: {e}")
         sys.exit(1)
     st = state.get()
+    api.set_log_name(st.get("genre", ""), st.get("title", "untitled"))
     header_print(f"再開：『{st.get('title', '?')}』シーン{st.get('scene_no', '?')}から")
     writing_loop()
 
@@ -275,6 +277,8 @@ def main() -> None:
     title = input("タイトルを入力してください: ").strip()
     if not title:
         title = "無題"
+
+    api.set_log_name(genre, title)
 
     length = _choose_length()
 

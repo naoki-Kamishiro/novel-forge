@@ -56,6 +56,14 @@ class _Spinner:
 # デバッグログの出力先
 _LOG_DIR = Path(__file__).parent / "debug"
 _LOG_DIR.mkdir(exist_ok=True)
+_log_stem: str = datetime.date.today().isoformat()  # デフォルトは日付
+
+
+def set_log_name(genre: str, title: str) -> None:
+    """ログファイル名をジャンル・タイトルで設定する（main.pyからタイトル確定後に呼ぶ）。"""
+    global _log_stem
+    safe = lambda s: "".join(c for c in s if c not in r'\/:*?"<>|')[:20]
+    _log_stem = f"{safe(genre)}_{safe(title)}"
 
 
 def _debug_log(label: str, content: str) -> None:
@@ -64,7 +72,7 @@ def _debug_log(label: str, content: str) -> None:
     ts = datetime.datetime.now().strftime("%H:%M:%S")
     line = f"[{ts}] [{label}]\n{content}\n{'='*60}\n"
     print(line, file=sys.stderr)
-    log_file = _LOG_DIR / f"{datetime.date.today()}.log"
+    log_file = _LOG_DIR / f"{_log_stem}.log"
     with open(log_file, "a", encoding="utf-8") as f:
         f.write(line)
 
