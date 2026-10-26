@@ -165,7 +165,8 @@ def generate_scene(scene_id: str | None = None) -> str:
             # 検証不要（ショートショート）はそのまま返す
             state.update({"beat_ptr": new_beat_ptr})
             check_repetition(scene_text, scene_no)
-            return scene_text
+            _check_end_marker(scene_text, scene_no, max_tokens)
+            return scene_text.replace("[END]", "").rstrip()
 
         # 矛盾チェック
         diff, errors = verify.verify_scene(scene_text, scene_id, char_names)
@@ -174,9 +175,10 @@ def generate_scene(scene_id: str | None = None) -> str:
             # OK: beat_ptrを進める
             state.update({"beat_ptr": new_beat_ptr})
             check_repetition(scene_text, scene_no)
+            _check_end_marker(scene_text, scene_no, max_tokens)
             if config.DEBUG_MODE:
                 print(f"[scene] scene_id={scene_id} OK diff_chars={len(diff.get('characters', []))}", file=sys.stderr)
-            return scene_text
+            return scene_text.replace("[END]", "").rstrip()
 
         # 矛盾あり: エラーをメッセージに追加してリトライ
         error_msg = "前回の出力に以下の矛盾がありました。修正して書き直してください:\n" + "\n".join(f"- {e}" for e in errors)
@@ -190,7 +192,8 @@ def generate_scene(scene_id: str | None = None) -> str:
     # 最終試行でも矛盾が残った場合は最後の生成結果を使う
     system_print("矛盾が残りましたが最終試行の結果を使用します")
     state.update({"beat_ptr": new_beat_ptr})
-    return scene_text
+    _check_end_marker(scene_text, scene_no, max_tokens)
+    return scene_text.replace("[END]", "").rstrip()
 
 
 def _get_scene_beat(plot: dict, chapter_no: int | None, scene_no: int) -> str:
@@ -206,6 +209,22 @@ def _get_scene_beat(plot: dict, chapter_no: int | None, scene_no: int) -> str:
 # ──────────────────────────────────────────────
 # 本文の保存・末尾取得
 # ──────────────────────────────────────────────
+
+def _check_end_marker(scene_text: str, scene_no: int, max_tokens: int) -> None:
+    """
+    [END]マーカーの有無でmax_tokens到達を判定してログに出す。
+    修正はしない。気づきのための簡易チェック。
+    """
+    from display import warn_print
+    has_end = "[END]" in scene_text
+    # 文字数からトークン数を粗く推定（日本語は1字≒1.5token）
+    approx_tokens = int(len(scene_text) * 1.5)
+    if not has_end and approx_tokens >= max_tokens * 0.9:
+        warn_print(f"シーン{scene_no} ⚠ [END]なし・推定{approx_tokens}tok（上限{max_tokens}tok）→ max_tokens到達で途切れた可能性")
+    elif not has_end:
+        warn_print(f"シーン{scene_no} ⚠ [END]なし（LLMが書ききれなかった可能性）")
+    # [END]ありなら正常完了（ログなし）
+
 
 def check_repetition(scene_text: str, scene_no: int) -> None:
     """
