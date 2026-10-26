@@ -80,13 +80,8 @@ def _build_system(length: str) -> str:
         "long":  "長編（10万字〜）向けプロット。全フィールドに加えてsubplotsも生成してください。",
     }[length]
 
-    return f"""あなたは小説のプロット設計者です。
-ジャンルとタイトルを受け取り、以下のJSON形式でプロットを出力してください。
-説明文は不要です。JSONのみ出力してください。
-
-{depth_note}
-
-出力フォーマット（不要なフィールドは省略可）:
+    # 長さ別にフォーマットを出し分ける
+    fmt_base = """\
 {{
   "protagonist": {{
     "name": "主人公の名前",
@@ -118,7 +113,10 @@ def _build_system(length: str) -> str:
       "content": "何が起きるか",
       "cost": "代償（choiceの場合）"
     }}
-  ],
+  ]
+}}"""
+
+    fmt_acts = """
   "acts": [
     {{
       "act": 1,
@@ -134,15 +132,35 @@ def _build_system(length: str) -> str:
       "summary": "この章で起きること",
       "end_state": "章末の状態"
     }}
-  ],
+  ]"""
+
+    fmt_subplots = """
   "subplots": [
     {{
       "name": "サブプロット名",
       "summary": "概要",
       "resolution": "回収方法"
     }}
-  ]
-}}"""
+  ]"""
+
+    if length == "flash":
+        fmt = fmt_base
+    elif length == "short":
+        fmt = fmt_base
+    elif length == "medium":
+        # acts/chapter_outlinesをbeatsの後に挿入
+        fmt = fmt_base.rstrip("}}") + "," + fmt_acts + "\n}}"
+    else:  # long
+        fmt = fmt_base.rstrip("}}") + "," + fmt_acts + "," + fmt_subplots + "\n}}"
+
+    return f"""あなたは小説のプロット設計者です。
+ジャンルとタイトルを受け取り、以下のJSON形式でプロットを出力してください。
+説明文は不要です。JSONのみ出力してください。
+
+{depth_note}
+
+出力フォーマット:
+{fmt}"""
 
 
 def _build_user(genre: str, title: str, length: str) -> str:
